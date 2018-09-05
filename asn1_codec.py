@@ -93,7 +93,7 @@ class Asn1Codec(object):
         return supported_msgs
     
     def get_message_definition(self, msg_name):
-        return self.asn_mgmt.get_message_definition(msg_name):
+        return self.asn_mgmt.get_message_definition(msg_name)
     
     def _get_pdu_str(self, msg_name):
         for module in self.msgs_in_modules:
