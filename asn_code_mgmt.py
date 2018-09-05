@@ -1,5 +1,5 @@
 import re
-
+from utils import reformat_asn_line
 
 class AsnCodeMgmt(object):
     def __init__(self, data):

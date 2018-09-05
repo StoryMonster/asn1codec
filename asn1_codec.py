@@ -1,10 +1,10 @@
 import re
 import ast
 import binascii
-from src.json_formater import format_json
-from src.utils import change_variable_to_python_style, get_supported_messages_in_modules, reformat_asn_line
-from src.asn_code_mgmt import AsnCodeMgmt
-from src.asn_codec_error import AsnCodeError
+from json_formater import format_json
+from utils import change_variable_to_python_style, get_supported_messages_in_modules, reformat_asn_line
+from asn_code_mgmt import AsnCodeMgmt
+from asn_codec_error import AsnCodeError
 
 
 class Asn1Codec(object):
@@ -18,7 +18,7 @@ class Asn1Codec(object):
         try:
             self.asn_mgmt = AsnCodeMgmt(data)
             ckw = {'autotags': True, 'extimpl': True, 'verifwarn': True}
-            from externals.pycrate.pycrate_asn1c.proc import compile_text, generate_modules, PycrateGenerator
+            from pycrate_asn1c.proc import compile_text, generate_modules, PycrateGenerator
             compile_text(data, **ckw)
             generate_modules(PycrateGenerator, self.py_file)
         except AsnCodeError as e:
