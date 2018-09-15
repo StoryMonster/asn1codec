@@ -9,12 +9,19 @@ from asn_codec_error import AsnCodeError
 
 class Asn1Codec(object):
     def __init__(self, py_file, module):
+        """
+          py_file: the python file name which should be the output py file of pycrate
+          module: the module of py_file, it's a string like "xx.xxxx.xx", which can be recorgnized by __import__
+        """
         self.py_file = py_file
         self.msgs_in_modules = {}
         self.asn_mgmt = None
         self.module = module
 
     def compile(self, data):
+        """
+          data: the whole asn1 data
+        """
         try:
             self.asn_mgmt = AsnCodeMgmt(data)
             ckw = {'autotags': True, 'extimpl': True, 'verifwarn': True}
@@ -33,6 +40,12 @@ class Asn1Codec(object):
         return True, "Compile Success!", msgs
     
     def encode(self, protocol, format, msg_name, msg_content):
+        """
+          protocol: to spicify the encode mothod, per/uper/ber/cer/der
+          format: to spicify the format of input message content, asn1/json
+          msg_name: the name of message to encode
+          msg_content: the content of message to encode
+        """
         pdu_str = self._get_pdu_str(msg_name)
         if pdu_str is None: return False, "Unknow message!"
         modules = [change_variable_to_python_style(module) for module in self.msgs_in_modules]
@@ -61,6 +74,12 @@ class Asn1Codec(object):
         return True, binascii.hexlify(payload).decode("utf-8")
     
     def decode(self, protocol, format, msg_name, payload):
+        """
+          protocol: to spicify the decode mothod, per/uper/ber/cer/der
+          format: to spicify the format of input message content, asn1/json
+          msg_name: the name of message to decode
+          msg_content: the content of message to decode
+        """
         ## the length of payload must be even, and payload should be hex stream
         pdu_str = self._get_pdu_str(msg_name)
         if pdu_str is None: return False, "Unknow message!"
@@ -96,6 +115,9 @@ class Asn1Codec(object):
         return self.asn_mgmt.get_message_definition(msg_name)
     
     def _get_pdu_str(self, msg_name):
+        """
+          msg_name: the asn1 format name of msg
+        """
         for module in self.msgs_in_modules:
             for msg in self.msgs_in_modules[module]:
                 if msg == msg_name:
