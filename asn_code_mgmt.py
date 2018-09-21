@@ -1,6 +1,19 @@
 import re
 from utils import reformat_asn_line
 
+def match_basic_asn_line(line):
+    patterns = [(r"\-\-.*", "comment"),
+                (r"BEGIN", "begin"),
+                (r"END", "end"),
+                (r"([\w\-]+)\s*::=.*", "message"),
+                (r"([\w\-]+)\s+[\w\-]+\s+::=.*", "macro")]
+    for pattern in patterns:
+        matched = re.match(pattern[0], line)
+        if matched:
+            return matched, pattern[1]
+    return None, ""
+
+
 class AsnCodeMgmt(object):
     def __init__(self, data):
         self.lines = data.split('\n')
@@ -8,6 +21,39 @@ class AsnCodeMgmt(object):
         self._reformat_and_store_as_msgs_with_definition(data)
     
     def _reformat_and_store_as_msgs_with_definition(self, data):
+        lines = data.split('\n')
+        code_blocks = []
+        code_block = ''
+        for line in lines:
+            line_without_space = line.strip()
+            if line_without_space == "": continue
+            matched, pattern = match_basic_asn_line(line_without_space)   
+            if matched:
+                if pattern is "comment": pass
+                elif pattern in ("begin", "end"):
+                    code_block = " ".join(code_block.split())
+                    code_blocks.append(code_block)
+                    code_block = ''
+                elif pattern in ("message", "macro"):
+                    code_block = " ".join(code_block.split())
+                    code_blocks.append(code_block)
+                    code_block = (line_without_space + " ")
+            else:
+                code_block += (line_without_space + " ")
+        if code_block.strip() != "":
+            code_block = " ".join(code_block.split())
+            code_blocks.append(code_block)
+        fd = open("out.txt", "w")
+        for code_block in code_blocks:
+            try:
+                fd.write(code_block + "\n")
+                msg_name = code_block.split()[0].split("::=")[0]
+                self.msgs_with_definition[msg_name] = code_block
+            except Exception as e:
+                fd.write(str(e))
+        fd.close()
+
+    def _reformat_and_store_as_msgs_with_definition_1(self, data):
         lines = data.split('\n')
         line_counter = 0
         macros = []

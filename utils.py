@@ -19,11 +19,11 @@ def get_supported_messages_in_modules(file):
         supported_msgs_in_modules[change_variable_to_asn_style(module)] = []
     
     patterns = ((r"class\s([\w\_]+)\:", "class"),
-                (r"\s+([\w\_]+)\s*=\s*SEQ\(name=\'\S+\',\smode=MODE_TYPE\)", "sequence"))
+                (r"([\w\_]+)\s*=\s*SEQ\(name=\'\S+\',\smode=MODE_TYPE\)", "sequence"))
     current_module = ''
     for line in lines:
         for pattern in patterns:
-            matched = re.match(pattern[0], line)
+            matched = re.match(pattern[0], line.strip())
             if matched:
                 if pattern[1] == 'class':
                     current_module = change_variable_to_asn_style(matched.group(1))
